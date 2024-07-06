@@ -1,0 +1,20 @@
+# Version of docker-compose sintax
+version: "3.9"
+
+# Creates a service named app 
+services:
+  app:
+    # Current directory as the context
+    build:
+      context: .
+      args:
+        - DEV=true
+    # Mapped OS port 8000 to container 8000
+    ports:
+      - "8000:8000"
+    # Volume mapping from app to the container app allows hot deploy?
+    volumes:
+      - ./app:/app
+    # Command execution
+    command: >
+      sh -c "python manage.py runserver 0.0.0.0:8000"

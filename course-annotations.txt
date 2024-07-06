@@ -1,0 +1,89 @@
+1: introduction
+
+2: App Design
+    19 endpoints
+    User authentication
+    Admin panel
+    Swagger
+    Techs: 
+        Python
+        Django: Python web framework
+        Django add-on: Adds features to build REST APIs
+        PostgreSQL: Use ORM to create
+        Docker
+        Swagger
+        Github Actions
+        AWS
+    Project structure:
+        app/ Djando project
+        app/core/ Code shared between multiple apps, db definitions, etc
+        app/user/ Code related operations
+        app/recipe/ Code realted to recipes
+
+3: Unit tests:
+        Code that tests Code
+        Runs a piece of Code
+        Checks outputs with assertions
+        Ensures that code runs as expected
+        Catches Bugs
+        Improves reliability
+        Improves confidency to update the code
+    TDD:
+        Is a development practice to design tests before adding functionality
+        Write test and write the code
+            Write test > Run Test (Fails) > Add Feature > Run Test (Passes) > Re-Factor
+        Why?
+            Better undesrtanding of code
+            Make changes with confidence
+            Reduce Bugs 
+
+4: System Setup: VS Code, Docker, Git
+
+5: Project Setup
+    Why docker?
+        Consistent env between dev and prod
+        Easier collaboration: Allows choosing specific OS and envs, allows using the same requirements
+        Capture all requirements
+        Easier cleanup: Allows deleting the images and everithing associated with the container
+        Docker HUB: Allows storing and requesting images
+    Why docker compose?
+        Threats docker images as services, and you can handle more than one image per compose Setup
+        Allows port mappings configuration in code
+        Allows Volume mappings to get and insert files into container OS
+    
+    Create a authentication token in docker hub to use in integrations like GithubActions: https://hub.docker.com/settings/security?generateToken=true
+    
+    Create actions tokens to perform docker hub actenticated operations: https://github.com/VCalixtoR/recipe-app-api/settings/secrets/actions
+        DOCKERHUB_USER=
+        DOCKERHUB_TOKEN=
+    
+    Docker compose sample:
+        docker-compose run --rm app sh -c "python manage.py collectstatic"
+        --rm: to remove container on exit
+        sh -c "python manage.py collectstatic": to pass a shell command to the container at the end of container creation
+    Check Dockerfile and docker-compose for more details
+    
+    Linting: Running a tool that checks sintax patterns in code
+        Highlights errors, typos, formatting issues
+        We use flake8 in this course:
+            Avoid installing test requirements in production, only release versions to production if they are tested and linted in development
+            create a .flake8 in the app folder to exclude not owned code like __pycache__ for example
+            the linting requirement is listed in requirements.dev.txt
+            docker-compose run --rm app sh -c "flake8"
+        
+    Testing: We will use the Django test suit
+        Setup Django app and run tests through Docker Compose
+        docker-compose run --rm app sh -c "python manage.py test"
+
+    Creating Django:
+        docker-compose run --rm app sh -c "django-admin startproject app ."
+        As we are using a volume between the container and local OS the created structure will be present locally too
+
+    Release the project:
+        After configuring the preview steps, do a docker-compose up and you are okay to go
+
+6: Configuring Github Actions
+    Github Actions is an CI CD automation tool that allows running tasks when code changes
+    Allows running tests, code linting, deployment etc
+        Flow: Trigger > Job > Result
+    Files in .github/workflows/checks.yml can be another file name
