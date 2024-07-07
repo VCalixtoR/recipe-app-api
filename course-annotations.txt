@@ -255,3 +255,19 @@ Django things:
     django.urls.reverse to get specific urls to test or get for example
 
     admin.site.register(models.User, UserAdmin) inside admin to register a model, the UserAdmin is the custom you created with ordering, diplay etc
+
+11: API Documentation
+
+    "An API is only as good as its documentation"
+    Document all endpoints, its support methods, payload formats, json formats, response format and authentication process
+    We will use automated documentation using metadata
+
+    Docs with Django REST Framework(DRF):
+        Allows auto generating docs using the drf-spectacular library
+            pip install drf-spectacular
+        It generates schema (openapi.json?)
+        The schema is used to generate a web interface that allows authentication and test to endpoints methods
+    
+    OpenAPI Schema is a  yaml/json standard for describing APIs
+        Suported by most API documentation tools like Swagger
+        Using: local importing the schema, in the browser /docs endpoint
