@@ -201,3 +201,50 @@ Django things:
                 Check model changes and creates migration file: python manage.py makemigrations
                 Do the migration: python manage.py migrate
 
+9: Create User Model
+
+    Django authentication: Django comes with a buitin user authenctication
+        Registration
+        Login
+        Auth
+    Integrates with admin
+    It has the defaulkt user but is best to define your own model
+
+    AbstractBaseUser
+        Provides features for authentication
+        Does not include files
+    Permissions Mixin
+        Django Builtin permissions system :O
+
+    Create the User model:
+        class User(AbstractBaseUser, PermissionsMixin)
+        USERNAME_FIELD = 'email' -> Changes tje username base field to email
+
+    Use the model django.contrib.auth.get_user_model to get project default user model and voiding calling the custom model directory
+    Use @example.com to test user emails
+    get_user_model()...user.check_password is the default password check operation
+    user.set_password() creates the password
+    user.save(using=self.db) para salvar, using=self.db para indicar o banco no cenario de varios dbs
+    objects = UserManager() inside a model to assign the user manager to a model
+
+    If you have problems with migrations try to delete the docker volume with db data and redo the migration
+        docker volume ls
+        docker volume rm volume name
+    
+    self.assertRaises(ExceptionType) to assert if something raises an error
+
+    def create_superuser in UserManager to replace deafult superuser creating
+        make sure to use correct sintax: user.is_staff user.is_superuser
+    
+    http://localhost:8000/admin to access admin panel
+        python manage.py createsuperuser
+
+10: Setup django admin
+
+    Django Admin is a graphical user for models:
+        Allows CRUD operations
+    Very little coding
+    How to enable:
+        Enable per model inside admin.py: Example: admin.site.register(Recipe)
+    Its possible to Customise using the classes ModelAdmin and userAdmin
+        ordering, list_display, fieldsets, readonly_fields, and other properties
