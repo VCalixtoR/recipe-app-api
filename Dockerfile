@@ -10,6 +10,12 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # This arg is overriden by the local docker-compose, but for production environment the raw container is deploied
 ARG DEV=false
 
+# Install PostgreSQL client libraries and development headers
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
+    python3-dev
+
 # Copy and install dependencies using a virtual environment to avoid conflicts with the base Python image
 # The tmp files are deleted and a user for the image is added
 # Using a user avoids security risks if an attacker gets access to the Docker container

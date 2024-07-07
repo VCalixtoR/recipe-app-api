@@ -3,6 +3,17 @@ version: "3.9"
 
 # Creates a service named app 
 services:
+
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - dev-db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=devdb
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=changeme
+
+
   app:
     # Current directory as the context
     build:
@@ -12,9 +23,22 @@ services:
     # Mapped OS port 8000 to container 8000
     ports:
       - "8000:8000"
-    # Volume mapping from app to the container app allows hot deploy?
+    # Volume mapping from app to the container app allows transfering files betwen local and container
     volumes:
       - ./app:/app
     # Command execution
     command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=devdb
+      - DB_USER=devuser
+      - DB_PASS=changeme
+    depends_on:
+      - db
+
+
+volumes:
+  dev-db-data: 

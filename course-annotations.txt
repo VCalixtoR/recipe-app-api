@@ -1,3 +1,24 @@
+Django things:
+    Commands:
+        Build the project: django-admin startproject app .
+        Testing:           python manage.py test
+        Creating an app:   python manage.py startapp appname
+
+    Registering an APP:
+        first create the app: python manage.py startapp appname
+        add its reference to the settings.py file inside INSTALLED_APPS like:
+            'appname'
+    
+    Console printing
+        self.stdout.write to console to the terminal
+            self.style.SUCCESS inside to print green messages
+
+    Creating Django management commands (Like the command to wait for db to be ready):
+        inside the specific app, create the directory management/commands, both needs the __init__.py module
+        create a class Command(BaseCommand): and a def handle(self, *args, **kwargs) that does the command operation
+        after you can use the command in the command line :)
+
+
 1: introduction
 
 2: App Design
@@ -16,7 +37,7 @@
         AWS
     Project structure:
         app/ Djando project
-        app/core/ Code shared between multiple apps, db definitions, etc
+        app/general/ Code shared between multiple apps, db definitions, etc
         app/user/ Code related operations
         app/recipe/ Code realted to recipes
 
@@ -87,3 +108,96 @@
     Allows running tests, code linting, deployment etc
         Flow: Trigger > Job > Result
     Files in .github/workflows/checks.yml can be another file name
+
+7: Testing in Django
+    Django comes with its test framework that uses unittest (Default to python language)
+    Some particular features for Django base:
+        Test client - A web browser to test like an outside client
+        Simulate authentication
+        Temporary database - Automatic create the database and finishes after the tests ends
+    Django REST Framework:
+        API Test client - Used to test api requests
+    
+    Test structure:
+        The tests are placed in tests.py
+        You can use tests/ subdirectory instead.
+            In this case it needs to contain the __init__.py modules
+            All tests need to start with test_
+    
+    Test Database:
+        Allows testing code that uses databases (Do not use the real database to test)
+        Django creates the database for testing
+        The default form of doing that is by creating the database, running a single test and clearing the database
+            Every test has a new database
+            Is possible to avoid this and reusing the same dataset for more tests but it is not recommended
+    
+    Test Classes:
+        SimpleTestCase: Do not have database integration, useful for no required database tests
+        TestCase: Database required
+    
+    Writing test steps:
+        Import test classes
+        Import objects to test
+        Define test class
+        Add test method
+        Setup inputs
+        Execute code to be tested
+        Check outputs
+
+    For TDD: Write the test first and after the code
+
+    Mocking: Override or change the behavior od dependencies
+        Avoid unnitended side effects and isolate the code being tested
+        Why?
+            Avoid relying on external services like external APIs
+            Avoid unitended consequences
+            Speed up tests
+        Example: Mock email sending steps to avoid sending it
+        How:
+            Use unittest.mock:
+                MagicMock/Mock - Replace real objects
+                Patch - Overrides code for tests
+
+    Testing web requests:
+        To test apis use APIClient 
+            Make the request, check the result
+            Override authentication
+            Example:
+                client = APIClient()
+                res = client.get('/endpoint/')
+                self.assertEquals(res.status_code, 200)
+
+8: Configure Database
+    We will use PostgreSQL created within a container (Service in docker-compose), it is easilly deployed locally
+        An idea is to switch by running local within a container and in dev/prod in RDS
+    Why using in a docker compose locally?
+        Reusability
+        Use persistance volumes to save the data
+        Handles network configuration
+        Environment variabel configuration
+    
+    Psycopg: The database connector (database adaptor) dependency that we will use in this course
+        psycopg2-binary is not recommended for production environments
+        psycopg2 is recommended but requires more dependencies that can causes conflicts between different OSs
+            Not a problem for docker scenarios, you just need to configure aditional steps in the Dockerfile to handle its dependencies
+    
+    As the APP depends on the DB, use depends_on in the docker-compose
+        depends_on does not guarantee that the database is ready, instead it guarantees that the service is started
+        Solve it making django waits for db to be ready creating a custom django management command
+
+    Creates a Django app: docker-compose run --rm app sh -c "python manage.py startapp appname"
+    Makes the Django wait for DB to be ready using BaseCommands
+
+    ORM: Allows creating db schema automatilcally given object declarations
+        Focus on code
+        Migrate easily between different dbs
+        How?
+            Define models > Generate migration files > Setup database > Store data
+            Each model maps to a table, that contains:
+                Name, Fields, Other metadata(Relation), custom python code
+            Creating migrations
+                The app must ne enabled in settings.py
+                Wait for db to be ready
+                Check model changes and creates migration file: python manage.py makemigrations
+                Do the migration: python manage.py migrate
+
