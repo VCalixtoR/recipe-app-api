@@ -18,6 +18,34 @@ Django things:
         create a class Command(BaseCommand): and a def handle(self, *args, **kwargs) that does the command operation
         after you can use the command in the command line :)
 
+    Creating a API APP
+        create the app python manage.py startapp appname
+        remove unused files inside the created app
+        create tests TDD:
+            create the test package with __init__.py and a test_... module
+            use setUp to create a APIClient()
+            create methods to handle each http response possible
+        
+        Create serializers: REST framework uses serializers to map  between python django objects and database models
+            Serialization: Converts Django model instances, querysets, or other Python objects into JSON or other content types (Send as API response).
+            Deserialization: Converts JSON or other content types back into complex data types and validates the input data (Converts to object from API input).
+            Also its possible to make input validation before se
+
+            serializers.ModelSerializer allows the conversion of raw JSON/XML to python/django objects that can be saved in databases
+                Meta class indicates the related model, fields and input parsing that the serializer will parse (Wich model is representing)
+                Serializers has its already implemented CRUD operations, but you can override it to do personalization
+                Meta is executed before any other method to validate the input
+
+        Use the serielizer in the views file:
+            create a View class that uses a generics class to handle specific http requests like generics.CreateAPIView
+            inside the class, set required parameters like the serializer_class defined before
+        
+        Create the url mapping in the urls.py file
+            the app_name is import to do reversed lookup url methods
+            urlpatterns is used to define the endpoint mapping to specific views
+        
+        Add the url mapping to the django settings:
+            In the settings urlpatterns concat a new path for the url including the path for urls file in the app 'appname.urls'
 
 1: introduction
 
@@ -271,3 +299,34 @@ Django things:
     OpenAPI Schema is a  yaml/json standard for describing APIs
         Suported by most API documentation tools like Swagger
         Using: local importing the schema, in the browser /docs endpoint
+
+12: User API
+    Endpoints:
+        POST user/create/
+        POST user/token/
+        GET PUT PATCH user/me/
+    
+    Check more about django > Creating a API APP in the start of this file
+
+    Authentication:
+        Types:
+            Basic http username and password
+            Token: Http token
+            JWT: Use an access and refresh token
+            Session: Use cookies
+        We will use Token, how it works:
+            Create the token based on username/password > Store the token in client side > Include token in http headers
+        Pros: Supported, Simply to use, avoid sending username and password
+        Cons: Token needs to be secure, require database requests
+        Logout: Delete the token
+
+        How to create:
+            Start by writing the tests
+            Include the rest_framework.authtoken in the INSTALLED_APPS
+            Create a serializers.Serializer for the token that uses the django.contrib.auth.authenticate inside a validation method
+            Create the required serializer fields and the validate method that receives attrs and uses authenticate
+            Configure the views to include the new view
+                Use rest_framework.authtoken.views.ObtainAuthToken as the view class inheritance to reuse the configuration
+                Use the class name done before as the serializer class
+                Use rest_framework.settings.api_settings to set renderer_classes as the api_settings.DEFAULT_RENDERER_CLASSES
+            Add the view to the urls.py
